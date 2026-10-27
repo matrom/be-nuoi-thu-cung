@@ -22,7 +22,10 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .gear{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);right:12px;width:48px;height:48px;font-size:26px;background:none;opacity:.4}
 .logo span{display:inline-block;font-size:clamp(46px,15vw,70px);animation:bob 1.2s infinite ease-in-out}
 .best{font-size:28px;font-weight:800}
-.top{display:flex;justify-content:space-between;width:100%;font-size:28px;font-weight:800;align-items:center}
+.top{display:flex;justify-content:space-between;width:100%;font-size:26px;font-weight:800;align-items:center;padding:2px 0}
+.top-nav{display:flex;gap:8px;align-items:center}
+.nav-btn{width:42px;height:42px;border-radius:50%;background:var(--card);color:var(--cink);border:2px solid var(--peach);box-shadow:0 3px 0 #0002;font-size:20px;display:inline-flex;align-items:center;justify-content:center;transition:transform .1s,box-shadow .1s;padding:0;cursor:pointer}
+.nav-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0002}
 .hearts span{font-size:36px;margin-left:4px}.hearts .off{opacity:.2;filter:grayscale(1)}.hearts .last{animation:pulse 1s infinite}
 .bar{width:100%;height:16px;border-radius:8px;background:#0002;overflow:hidden}.bar i{display:block;height:100%;background:var(--star);transition:width .4s}
 .bub{width:112px;height:112px;border-radius:50%;background:#fff;border:5px solid var(--peach);display:flex;align-items:center;justify-content:center;font-size:56px;color:#4E342E;animation:bob 1.5s infinite ease-in-out;transition:opacity .5s;position:relative}
@@ -72,7 +75,7 @@ function confetti(n){if(D.rm)return;for(let i=0;i<(n||50);i++){const c=document.
 function splash(){cur='splash';A.innerHTML='<div class="logo"><span>🐰</span><span style="animation-delay:.3s">🐱</span><span style="animation-delay:.6s">🐻</span><span style="animation-delay:.9s">🐶</span></div><div class="big" style="font-size:44px">🐾</div>';setTimeout(home,2000)}
 function home(){cur='home';clr();A.innerHTML=`<button class="gear" id="pg" aria-label="Dành cho phụ huynh">⚙️</button><div class="logo">${['🐰','🐱','🐻','🐶'].map((a,i)=>`<span style="animation-delay:${i*.3}s">${a}</span>`).join('')}</div><button class="play" id="go" aria-label="Chơi ngay">▶️ CHƠI NGAY</button><div class="best" aria-label="Điểm cao nhất ${D.best}">🏆 ⭐ ${D.best}</div><div><button class="ib" id="sn" aria-label="Âm thanh">${D.snd?'🔊':'🔇'}</button><button class="ib" id="mu" aria-label="Nhạc nền">${D.mus?'🎵':'🔕'}</button><button class="ib" id="co" aria-label="Bộ sưu tập thú cưng">🐾</button></div>`;
  $('#go').onclick=()=>{sPop();start()};$('#pg').onclick=gate;$('#sn').onclick=()=>{D.snd=!D.snd;save();home()};$('#mu').onclick=()=>{D.mus=!D.mus;save();home()};$('#co').onclick=coll}
-function coll(){cur='coll';A.innerHTML=`<div class="best">🐾 ${un().length}/${PETS.length}</div><div class="opts">${PETS.map(([p,t])=>`<div class="opt" style="min-height:96px;height:110px;opacity:${D.best>=t?1:.35}" aria-label="${D.best>=t?'Đã mở':'Chưa mở, cần '+t+' sao'}">${D.best>=t?p:'🔒'}</div>`).join('')}</div><div style="font-size:26px">${D.stk.slice(-8).join(' ')}</div><button class="sec" id="b">🏠</button>`;$('#b').onclick=home}
+function coll(){cur='coll';try{history.pushState({p:'c'},'')}catch(e){}A.innerHTML=`<div class="best">🐾 ${un().length}/${PETS.length}</div><div class="opts">${PETS.map(([p,t])=>`<div class="opt" style="min-height:96px;height:110px;opacity:${D.best>=t?1:.35}" aria-label="${D.best>=t?'Đã mở':'Chưa mở, cần '+t+' sao'}">${D.best>=t?p:'🔒'}</div>`).join('')}</div><div style="font-size:26px">${D.stk.slice(-8).join(' ')}</div><button class="sec" id="b" style="display:flex;align-items:center;justify-content:center;gap:8px">🏠 <span>VỀ TRANG CHỦ</span></button>`;$('#b').onclick=home}
 /* questions */
 const COL=[['#e53935','đỏ'],['#1e88e5','xanh dương'],['#fdd835','vàng'],['#43a047','xanh lá'],['#8e24aa','tím'],['#fb8c00','cam']],SHP=[['●','tròn'],['▲','tam giác'],['■','vuông'],['★','ngôi sao'],['♥','trái tim']],PR=[['🐰','🥕','cà rốt'],['🐱','🐟','cá'],['🐻','🍯','mật ong'],['🐶','🦴','xương'],['🐵','🍌','chuối'],['🐹','🌻','hoa hướng dương']];
 const dot=c=>`<i class="dot" style="background:${c[0]}"></i>`;
@@ -83,13 +86,17 @@ function gen(L){const t=pick(L>0?['color','shape','pair','count']:['color','shap
  if(t==='count'){const n=1+Math.floor(Math.random()*5);h=`<span class="cnt" style="color:#4E342E">${'●'.repeat(n)}</span>`;o=[n,...shuf([1,2,3,4,5].filter(x=>x!==n)).slice(0,k-1)].map((x,i)=>({h:`<span class="cnt">${'🍎'.repeat(x)}</span>`,l:x+' quả táo',ok:!i}))}
  return{t,an,h,o:shuf(o)}}
 const lv=s=>s<6?0:s<16?1:s<31?2:3;let sc=0,wr=0,lk=0,q;
-function start(){clr();if(D.lim&&(D.t[day()]||0)>=D.lim*60)return rest();sc=0;wr=0;next()}
-function hud(){return `<div class="top"><span id="sc">⭐ ${sc}</span><span class="hearts" aria-label="${3-wr} mạng">${[0,1,2].map(i=>`<span class="${i>=3-wr?'off':3-wr===1?'last':''}">❤️</span>`).join('')}</span></div><div class="bar"><i style="width:${(sc%5)*20}%"></i></div>`}
+function start(){clr();if(D.lim&&(D.t[day()]||0)>=D.lim*60)return rest();try{history.pushState({p:'g'},'')}catch(e){}sc=0;wr=0;next()}
+function hud(){return `<div class="top"><div class="top-nav"><button class="nav-btn" id="nb-back" aria-label="Quay lại / Tạm dừng" title="Tạm dừng / Quay lại">←</button><button class="nav-btn" id="nb-home" aria-label="Về trang chủ" title="Về trang chủ">🏠</button></div><span id="sc">⭐ ${sc}</span><span class="hearts" aria-label="${3-wr} mạng">${[0,1,2].map(i=>`<span class="${i>=3-wr?'off':3-wr===1?'last':''}">❤️</span>`).join('')}</span></div><div class="bar"><i style="width:${(sc%5)*20}%"></i></div>`}
+function pauseModal(){clr();if(sc>D.best){D.best=sc;save()}const d=modal(`<div style="font-size:52px">⏸️</div><div style="font-size:24px;font-weight:800;color:var(--cink)">BÉ MUỐN NGHỈ HẢ?</div><div style="font-size:20px;font-weight:700;color:#FF9800">⭐ Điểm của bé: ${sc}</div><button class="play" id="pm-res" style="height:76px;font-size:24px;width:min(260px,80vw)">▶️ CHƠI TIẾP</button><button class="sec" id="pm-hm" style="height:56px;font-size:20px;width:min(260px,80vw);margin-top:6px">🏠 VỀ TRANG CHỦ</button>`);$('#pm-res').onclick=()=>{ov=0;d.remove();next()};$('#pm-hm').onclick=()=>{ov=0;d.remove();home()}}
 function next(){clr();cur='game';lk=0;const L=lv(sc);q=gen(L);const C=['#81C784','#FFB74D','#90CAF9','#CE93D8'];
  A.innerHTML=`${hud()}<div class="bub ${L==1?'blink':''}" id="bb" aria-label="Thú muốn món này">${q.h}</div><div class="an ${L==3?'dance':''}" id="an">${q.an}</div><div class="opts">${q.o.map((x,i)=>`<button class="opt" style="--c:${C[i]}" data-i="${i}" aria-label="${x.l}">${x.h}</button>`).join('')}</div>`;
  if(L==2)later(()=>$('#bb')&&$('#bb').classList.add('dim'),2000);
  if(L==3){later(()=>{const b=$('#bb');if(b){b.classList.add('hide');const a=$('#an');a.classList.remove('dance');a.classList.add('tilt');a.insertAdjacentHTML('beforeend','<em>👉</em>')}},1500)}
- A.querySelectorAll('.opt').forEach(b=>b.onclick=()=>ans(b))}
+ A.querySelectorAll('.opt').forEach(b=>b.onclick=()=>ans(b));
+ const bBk=$('#nb-back'),bHm=$('#nb-home');
+ if(bBk)bBk.onclick=pauseModal;
+ if(bHm)bHm.onclick=()=>{if(sc>D.best){D.best=sc;save()}home()}}
 function sk(t,ok){const L=lv(sc);[t,...(L>1?['mem']:[])].forEach(k=>{const r=D.sk[k]=D.sk[k]||[0,0];r[1]++;if(ok)r[0]++})}
 function ans(b){if(lk)return;const x=q.o[b.dataset.i],an=$('#an');vib();sPop();sk(q.t,x.ok);
  if(x.ok){lk=1;wr=0;sc++;b.classList.add('ok');A.querySelectorAll('.opt').forEach(o=>o!==b&&o.classList.add('fade'));an.className='an hop';sTing();sCoin();vib(60);
@@ -119,5 +126,6 @@ function dash(){cur='dash';const t=D.t[day()]||0,m=Math.round(t/60),rt=k=>{const
  $('#lm').onclick=()=>{D.lim=LM[(LM.indexOf(D.lim)+1)%4];save();dash()};$('#ey').onclick=()=>{D.eye=!D.eye;save();dash()};$('#rm').onclick=()=>{D.rm=!D.rm;apply();save();dash()};$('#hc').onclick=()=>{D.hc=!D.hc;apply();save();dash()}}
 document.addEventListener('pointerdown',()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},{once:true});
 if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})})}
+window.addEventListener('popstate',()=>{if(ov){ov=0;const o=$('#ov');if(o)o.remove();return}if(cur==='game'){if(sc>D.best){D.best=sc;save()}home()}else if(cur==='coll'||cur==='dash'||cur==='gate'||cur==='over'){home()}});
 splash();
 </script></body></html>
