@@ -1,0 +1,26 @@
+name: Build signed AAB for Google Play
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew && cd android && ./gradlew bundleRelease
+      - name: Sign AAB with upload key
+        env:
+          KS_B64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+        run: |
+          echo "$KS_B64" | base64 -d > upload.jks
+          jarsigner -keystore upload.jks -storepass "$KS_PASS" -sigalg SHA256withRSA -digestalg SHA-256 \
+            android/app/build/outputs/bundle/release/app-release.aab "$KEY_ALIAS"
+          cp android/app/build/outputs/bundle/release/app-release.aab app-release-signed.aab
+      - uses: actions/upload-artifact@v4
+        with: { name: be-nuoi-thu-cung-aab, path: app-release-signed.aab }

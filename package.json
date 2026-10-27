@@ -1,0 +1,11 @@
+{
+  "name": "be-nuoi-thu-cung",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "sync": "cap sync android" },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/core": "latest"
+  },
+  "devDependencies": { "@capacitor/cli": "latest" }
+}
